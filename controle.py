@@ -277,15 +277,98 @@ class Controle:
                 print("media: " + str(media))
                 return media
     def excluirCandidato(self, removeCandidato):
-        #print("- Eleito \n - Não eleito \n - Indeferido - \n + \n- deferido\n- deferido com  recurso  \n- indeferido"
-         #    + "\n- indeferido com recurso  \n- renúnica  \n- cancelado\n  ")
-        contador = 0
-        for elemento in listaGeral:
-            teste = elemento._Candidato__municipioNasc
-            if teste == removeCandidato:
-                print(teste ," == ", removeCandidato)
-                listaGeral.remove(elemento)
-            contador += 1
+        index = 0
+        removeCandidato = removeCandidato.upper()
+        while index < tamanhoLista:
+            sitCandidatura = listaGeral.pesquisa(index)._Candidato__sitCandidatura
+
+            sitCandidaturaPos = listaGeral.pesquisa(index)._Candidato__sitCandiPosEleito
+            sinCandidaturaPos  = sitCandidaturaPos.replace('"',"")
+            sitCandidatura = sitCandidatura.replace('"', "")
+            if removeCandidato == sitCandidatura or removeCandidato == sitCandidaturaPos:
+                x = listaGeral.pesquisa(index)
+                listaGeral.remove(x)
+            index += 1
+    def ordenandoCandidatos(self, entrada):
+        if entrada == "1":
+            index = 1
+            while index < tamanhoLista:
+
+                x = listaGeral.pesquisa(index)
+                comparacaoNomes01 = listaGeral.pesquisa(index)._Candidato__nomeCandidato
+                comparacaoNomes01 = comparacaoNomes01.replace('"',"")
+                j = index - 1
+                comparacaoNomes02 = listaGeral.pesquisa(j)._Candidato__nomeCandidato
+                comparacaoNomes02 = comparacaoNomes02.replace('"', "")
+                while j >= 0 and comparacaoNomes01 < comparacaoNomes02:
+                    print(comparacaoNomes01, "<", comparacaoNomes02)
+                    x = listaGeral.adicionarPosicao(j+1,listaGeral.pesquisa(j))
+                    print(j)
+                    j = j - 1
+                listaGeral.adicionarPosicao(j+1,x)
+                index += 1
+        elif entrada == "2":
+            verificacao = input("Forneça o nome do estado a ser analisado: ")
+            verificacao = verificacao.upper()
+            while index < tamanhoLista:
+                verificador = listaGeral.pesquisa(index)._Candidato__siglaUF
+                verificador = verificador.replace('"',"")
+                if verificacao == verificador:
+                    print(listaGeral.pesquisa(index))
+                verificador = ""
+                index += 1
+
+        elif entrada == "3":
+            verificacao = input("Forneça o nome da cidade a ser analisada: ")
+            verificacao = verificacao.upper()
+            while index < tamanhoLista:
+                verificador = listaGeral.pesquisa(index)._Candidato__municipioNasc
+                verificador = verificador.replace('"',"")
+                if verificacao == verificador:
+                     print(listaGeral.pesquisa(index))
+                verificador = ""
+                index += 1
+        elif entrada == "4":
+            verificacao = input("Forneça o nome do cargo a ser analisado: ")
+            verificacao = verificacao.upper()
+            while index < tamanhoLista:
+                verificador = listaGeral.pesquisa(index)._Candidato__descricaoCargo
+                verificador = verificador.replace('"',"")
+                if verificacao == verificador:
+                    print(listaGeral.pesquisa(index))
+                verificador = ""
+                index += 1
+        elif entrada == "5":
+            verificacao = float(input("Forneça um valor base -> "))
+            while index < tamanhoLista:
+                verificador = listaGeral.pesquisa(index)._Candidato__listaBens
+                verificador = verificador[0]
+                if verificador != None:
+                    if verificacao < verificador:
+                        print(listaGeral.pesquisa(index))
+                index += 1
+        elif entrada == "6":
+            verificacao = "ELEITO"
+            while index < tamanhoLista:
+                verificador = listaGeral.pesquisa(index)._Candidato__sitCandiPosEleito
+                verificador = verificador.replace('"',"")
+
+                if verificacao == verificador:
+                    print(listaGeral.pesquisa(index))
+                verificador = ""
+                index += 1
+        elif entrada == "7":
+            verificacao = "NÃO ELEITO"
+            while index < tamanhoLista:
+                verificador = listaGeral.pesquisa(index)._Candidato__sitCandidatura
+                verificador = verificador.replace('"',"")
+                if verificacao == verificador:
+                    print(verificacao)
+                verificador = ""
+                index += 1
+        else:
+            print("entrada inválida")
+        print(listaGeral.mostrar())
 for uf in UFs:
     candidatosConsulta = str(acessoArquivoConsulta + "/" + acessoListasConsulta + uf +".txt")
     candidatosBens = str(acessoArquivoBens + "/" + acessoListasBens + uf +".txt")
@@ -301,6 +384,7 @@ print("# 1 - Análise específica no banco de dados")
 print("# 2 - Análise ordenada dos elementos do banco de dados")
 print("# 3 - Análise específica das médias totais")
 print("# 4 - Remover candidatos específicos")
+print("# 5 - Análise dos candidatos de forma ordenada")
 opcao = input("\nForneça a numeração de acordo com a atividade desejada -> ")
 
 if opcao == "1":
@@ -325,6 +409,21 @@ elif opcao == "3":
     entrada = input("\nForneça a numeração de acordo com a atividade desejada -> ")
     x = candidatos.mediaTotalBens(entrada)
 elif opcao == "4":
-    entrada = input("Forneça um critério para exclução de candidatos do banco de dados ex: eleitos, não eleitos, indeferidos e etc-> ")
+    print("\n#   Removendo candidatos ")
+    entrada = input("\nForneça um critério para remoção dos candidatos da lista -> ")
     x = candidatos.excluirCandidato(entrada)
 
+elif opcao == "4":
+    print("- Eleito \n - Não eleito \n - Indeferido - \n + \n- deferido\n- deferido com  recurso  \n- indeferido"
+          + "\n- indeferido com recurso  \n- renúnica  \n- cancelado\n  ")
+    entrada = input("Forneça um critério para exclução de candidatos do banco de dados ex: eleitos, não eleitos, indeferidos e etc-> ")
+    x = candidatos.excluirCandidato(entrada)
+elif opcao == "5":
+    print("\n#   1 - Alfabética pelo nome em ordem crescente")
+    print("#   2 - Alfabética pelo nome em ordem decrescente")
+    print("#   3 - Pelo total dos bens (crescente)")
+    print("#   4 - Pelo total dos bens (decrescente)")
+    print("#   5 - Pela data de nascimento (crescente)")
+    print("#   6 - Pela data de nascimento (decrescente)")
+    entrada = input("\nForneça a numeração de acordo com a atividade desejada -> ")
+    candidatos.ordenandoCandidatos(entrada)
