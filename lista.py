@@ -1,128 +1,99 @@
-class No:
-    def __init__(self, dado, anterior = None, proximo = None):
-        self.dado = dado
-        self.anterior = anterior
-        self.proximo = proximo
+from operator import attrgetter
+class _No:
 
-class ListaDuplamenteEncadeada:
-    def __init(self):
-        pass
-    def listaVazia(self):
-        self.anterior = self.proximo = self.dado = No(None,None,None)
-    cabeca = None
-    rabo = None
+    def __init__(self, item=None, ante=None, prox=None):
+        self.item = item
+        self.prox = prox
+        self.ante = ante
+    
+   
+class Lista:
 
-    def pesquisa(self, index):
-        contador = 0
-        no_atual = self.cabeca
-        if index == 0:
-            if contador == index:
-                if no_atual.dado != None:
-                    return no_atual.dado
-                    contador += 1
+    def __init__(self):
+        self.__primeiro = self.__ultimo = _No()        
 
-        while contador <= index:
-            no_atual = no_atual.proximo
-            if contador == index:
-                if no_atual.dado != None:
-                    return no_atual.dado
-            contador += 1
-    def adicionar(self,dado):
-
-        novo_no = No(dado)
-        if self.cabeca is None:
-            self.cabeca = novo_no
-            self.rabo = novo_no
-
+    def vazia(self):
+        return self.__primeiro == self.__ultimo
+       
+    def pesquisa(self, item, key=None):
+        chave = key is not None and attrgetter(key) or (lambda x: x)        
+        aux = self.__primeiro.prox
+        while not aux is None and chave(aux.item) != item:
+            aux = aux.prox
+        if aux is None:
+            raise ValueError    
+        return aux.item
+    
+    def inserir(self, item):
+        self.__ultimo.prox = _No(item, self.__ultimo,None)
+        self.__ultimo = self.__ultimo.prox
+    
+    def inserirInicio(self, item):
+        aux = _No(item, self.__primeiro, self.__primeiro.prox)
+        self.__primeiro.prox = aux        
+        if self.vazia():
+            self.__ultimo = aux
         else:
-            novo_no.anterior = self.rabo
-            novo_no.proximo = None
-            self.rabo.proximo = novo_no
-            self.rabo = novo_no
-    def adicionarPosicao(self, index, teste):
-        novo_no = No(teste)
-        contador = 0
-        no_atual = self.cabeca
-        if index == 0:
-            if contador == index:
-                if no_atual.dado != None:
-                    no_atual.dado = novo_no
-                    contador += 1
-
-        while contador <= index:
-            no_atual = no_atual.proximo
-            if contador == index:
-                if no_atual.dado != None:
-                    no_atual.dado = novo_no
-            contador += 1
-    def adicionarAuxiliar(self, dado):
-        novo_no = No(dado)
-        if self.cabeca is None:
-            self.cabeca = novo_no
-            self.rabo = novo_no
-
+            aux.prox.ante = aux    
+    
+    def inserirOrdenado(self, item, cmp=lambda o1,o2: o1 <= o2):
+        if self.vazia(): 
+            self.inserir(item)
+            return
+        ref = self.__primeiro
+        while not ref.prox is None and cmp(ref.prox.item,item):
+            ref = ref.prox
+        aux = _No(item, ref,ref.prox)
+        ref.prox = aux
+        if aux.prox is None:
+            self.__ultimo = aux
         else:
-            novo_no.anterior = self.rabo
-            novo_no.proximo = None
-            self.rabo.proximo = novo_no
-            self.rabo = novo_no
-        if dado == True:
-            self.anterior = self.proximo = self.dado = self.cabeca = self.rabo = None
-    def adicionarInicio(self, dado):
-
-        novo_no = No(dado)
-        if self.cabeca == None:
-            self.cabeca = novo_no
-            self.rabo = novo_no
+            aux.prox.ante = aux    
+    
+    def removerInicio(self):
+        if(self.vazia()): return None
+        aux = self.__primeiro.prox
+        self.__primeiro.prox = aux.prox        
+        item = aux.item
+        if self.__ultimo == aux: 
+            self.__ultimo = self.__primeiro
         else:
-            novo_no.proximo = self.cabeca
-            novo_no.anterior = None
-            self.cabeca.anterior = novo_no
-            self.cabeca = novo_no
-    def remove(self, dado):
-        no_atual = self.cabeca
+            aux.prox.ante = self.__primeiro
+        aux.prox = None
+        del aux
+        return item
 
-        while no_atual != None:
-           if no_atual.dado == dado:
-                if no_atual.anterior == None:
-                    self.cabeca = no_atual.prox
-                    no_atual.proximo.anterior = None
-                else:
-                    no_atual.anterior.proximo = no_atual.proximo
-                    no_atual.proximo.anterior = no_atual.anterior
-           no_atual = no_atual.proximo
-    def removeInicio(self):
-        no_atual = self.cabeca
-        if self.cabeca == None:
-            x = "lista vazia"
-            return x
-        else:
-            self.cabeca = no_atual.prox
-            no_atual.proximo.anterior = None
-    def removeFinal(self):
-        no_atual = self.rabo
-        if self.cabeca == None:
-            x = "lista Vazia"
-            return x
-        else:
-            no_atual.anterior = None
-            no_atual.anterior.proximo = None
-    def mostrar(self):
-        no_atual = self.cabeca
-        while no_atual != None:
-            print(no_atual.dado)
-            no_atual = no_atual.proximo
-        print("=" * 80)
-    def acessar(self, index):
-        contador = 1
-        no_atual = self.cabeca
-
-        while contador <= index:
-            no_atual = no_atual.proximo
-            if contador == index:
-               return no_atual.dado
-            contador += 1
-
-lista = ListaDuplamenteEncadeada()
-
-
+    def removerFim(self):
+        if(self.vazia()): return None
+        aux = self.__ultimo
+        self.__ultimo = aux.ante
+        self.__ultimo.prox = None
+        item = aux.item
+        aux.prox = aux.ante = None
+        del aux
+        return item
+    
+    def __str__(self):
+        aux = self.__primeiro.prox
+        s = "["
+        while not aux is None:
+            s += str(aux.item) + ','
+            aux = aux.prox
+        
+        s = s.strip(',')
+        s += "]"
+        return s
+    
+    def __repr__(self):
+        return self.__str__()
+    
+    def __iter__(self):
+        self.__atual = self.__primeiro.prox 
+        return self
+    
+    def __next__(self):
+        if self.__atual is None:
+            raise StopIteration
+        item = self.__atual.item
+        self.__atual = self.__atual.prox
+        return item

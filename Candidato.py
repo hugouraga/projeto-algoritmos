@@ -1,201 +1,310 @@
+from Data import Data
+from Lista import Lista
+from Bem import Bem
+from collections import defaultdict
+import locale
+locale.setlocale(locale.LC_ALL, 'pt_br.utf-8')
+
+
 class Candidato:
-    def __init__(self, anoEleicao, siglaUF, codigoCargo, descricaoCargo, nomeCandidato, idCandidato, numeroUrna, cpf,
-                 nomeUrna, numeroPartido, nomePartido, siglaPartido, codigoOcupacao, descricaoOcupacao, dataNascimento
-                 , sexoCandidato, grauInstituicao, estadoCivil, UFNascimento, municipioNasc, sitCandiPosEleito,
-                 sitCandidatura,  listaBens):
-        self.__anoEleicao = anoEleicao
-        self.__siglaUF = siglaUF
-        self.__codigoCargo = codigoCargo
-        self.__descricaoCargo = descricaoCargo
-        self.__nomeCandidato = nomeCandidato
-        self.__idCandidato = idCandidato
-        self.__numeroUrna = numeroUrna
-        self.__cpf = cpf
-        self.__nomeUrna = nomeUrna
-        self.__numeroPartido = numeroPartido
-        self.__nomePartido = nomePartido
-        self.__siglaPartido = siglaPartido
-        self.__codigoOcupacao = codigoOcupacao
-        self.__descricaoOcupacao = descricaoOcupacao
-        self.__dataNascimento = dataNascimento
-        self.__sexoCandidato = sexoCandidato
-        self.__grauInstituicao = grauInstituicao
-        self.__estadoCivil = estadoCivil
-        self.__UFNascimento = UFNascimento
-        self.__municipioNasc = municipioNasc
-        self.__sitCandiPosEleito = sitCandiPosEleito
-        self.__sitCandidatura = sitCandidatura
-        self.__listaBens = listaBens
+    
+    def __init__(self, eleicao=None,
+                        uf=None,
+                        cod_cargo=None,
+                        desc_cargo=None,
+                        nome=None,
+                        num_seq=None,
+                        num_urna=None,
+                        cpf=None,
+                        nome_urna=None,
+                        num_partido=None,
+                        nome_partido=None,
+                        sigla_partido=None,
+                        cod_profissao=None,
+                        profissao=None,
+                        data_nasc=None,
+                        sexo=None,
+                        instrucao=None,
+                        estado_civil=None,
+                        uf_nasc=None,
+                        nome_municipio=None,
+                        sit_pleito=None,
+                        sit_cand=None):
+        '''
+        Constructor
+        '''
+        self.__eleicao=int(eleicao)
+        self.__uf=uf
+        self.__cod_cargo=int(cod_cargo)
+        self.__desc_cargo=desc_cargo
+        self.__nome=nome
+        self.__num_seq=num_seq
+        self.__num_urna=num_urna
+        self.__cpf=cpf
+        self.__nome_urna=nome_urna
+        self.__num_partido=int(num_partido)
+        self.__nome_partido=nome_partido
+        self.__sigla_partido=sigla_partido
+        self.__cod_profissao=int(cod_profissao)
+        self.__profissao=profissao
+        self.__data_nasc=Data.to_data(data_nasc)
+        self.__sexo=sexo
+        self.__instrucao=instrucao
+        self.__estado_civil=estado_civil
+        self.__uf_nasc=uf_nasc
+        self.__nome_municipio=nome_municipio
+        self.__sit_pleito=sit_pleito
+        self.__sit_cand=sit_cand
+        self.__bens=Lista()
 
-    def __str__(self):
-        return "\n{} -- {} -- {}\n{}\n{}\nResumo dos bens:\n  -  Total declado: {}\n  -  Total por tipo de bem: {}\n".format(
-            self.__nomeUrna, self.__numeroUrna, self.__siglaPartido, self.__descricaoOcupacao, self.__municipioNasc,
-            self.__listaBens.mostrar(), self.__listaBens.mostrar())
-
+    def __str__(self):        
+        saida = '{} -- {} -- {}\n'.format(self.nome_urna,self.num_urna,self.sigla_partido)
+        saida += '{} ({})\n'.format(self.desc_cargo,self.uf)
+        saida += 'Resumo dos bens:\n'        
+        saida += 'Total declarado: R${}\n'.format(locale.currency(self.total_bens(),grouping=True,symbol=False))
+        saida += '\n'.join(['{}: R${}'.format(chave,locale.currency(valor,grouping=True,symbol=False)) 
+                            for chave,valor in self.total_bens_por_tipo().items()])
+        return saida+'\n'
+    
     def __repr__(self):
-        return "\n{} -- {} -- {}\n{}\n{}\nResumo dos bens:\n  -  Total declado: {}\n  -  Total por tipo de bem: {}\n".format(
-            self.__nomeUrna, self.__numeroUrna, self.__siglaPartido, self.__descricaoOcupacao, self.__municipioNasc,
-            self.__listaBens, self.__listaBens)
+        return self.__str__()
+    
+    def inserirBem(self,bem):
+        assert isinstance(bem, Bem), "bem nao e' um objeto da classe Bem: {}".format(type(bem))
+        self.__bens.inserir(bem)
+    
+    def total_bens(self):
+        soma = 0.0
+        for bem in self.__bens:
+            soma += bem.valor
+        return soma
+    
+    def total_bens_por_tipo(self):
+        resultado = defaultdict(float)
+        for bem in self.__bens:
+            resultado[bem.desc_tipo] += bem.valor
+        return resultado    
+    
+    def __eq__(self, other):
+        if not isinstance(other, Candidato):
+            return False
+        return self.nome == other.nome and self.cpf == other.cpf
+    
+    def __ne__(self,other):
+        return not (self==other)
+    
+    def __lt__(self,other):
+        assert isinstance(other, Candidato), "other nao e' Candidato: {}".format(type(other))
+        return self.nome < other.nome
+    
+    def __le__(self,other):
+        assert isinstance(other, Candidato), "other nao e' Candidato: {}".format(type(other))
+        return self.nome <= other.nome
+    
+    def __gt__(self,other):
+        assert isinstance(other, Candidato), "other nao e' Candidato: {}".format(type(other))
+        return self.nome > other.nome
+    
+    def __ge__(self,other):
+        assert isinstance(other, Candidato), "other nao e' Candidato: {}".format(type(other))
+        return self.nome >= other.nome
+             
+    def __get_nome_municipio(self):
+        return self.__nome_municipio
 
-    def exibirBens(self):
-        pass
 
-    def getAnoEleicao(self):
-        return self.__anoEleicao
+    def __get_sit_pleito(self):
+        return self.__sit_pleito
 
-    def getSiglaUF(self):
-        return self.__siglaUF
 
-    def getCodigoCargo(self):
-        return self.__codigoCargo
+    def __get_sit_cand(self):
+        return self.__sit_cand
 
-    def getDescricaoCargo(self):
-        return self.__descricaoCargo
 
-    def getNomeCandidato(self):
-        return self.__nomeCandidato
+    def __set_nome_municipio(self, value):
+        self.__nome_municipio = value
 
-    def getIdCandidato(self):
-        return self.__idCandidato
 
-    def getNumeroUrna(self):
-        return self.__numeroUrna
+    def __set_sit_pleito(self, value):
+        self.__sit_pleito = value
 
-    def getCPF(self):
+
+    def __set_sit_cand(self, value):
+        self.__sit_cand = value
+
+        
+    def __get_eleicao(self):
+        return self.__eleicao
+
+
+    def __get_uf(self):
+        return self.__uf
+
+
+    def __get_cod_cargo(self):
+        return self.__cod_cargo
+
+
+    def __get_desc_cargo(self):
+        return self.__desc_cargo
+
+
+    def __get_nome(self):
+        return self.__nome
+
+
+    def __get_num_seq(self):
+        return self.__num_seq
+
+
+    def __get_num_urna(self):
+        return self.__num_urna
+
+
+    def __get_cpf(self):
         return self.__cpf
 
-    def getNomeUrna(self):
-        return self.__nomeUrna
 
-    def getNumeroPartido(self):
-        return self.__numeroPartido
-
-    def getNomePartido(self):
-        return self.__nomePartido
-
-    def getSiglaPartido(self):
-        return self.__siglaPartido
-
-    def getCodigoOcupacao(self):
-        return self.__codigoOcupacao
-
-    def getDescricaoOcupacao(self):
-        return self.__descricaoOcupacao
-
-    def getDataNascimento(self):
-        return self.__dataNascimento
-
-    def getSexoCandidato(self):
-        return self.__sexoNascimento
-
-    def getGrauInstituicao(self):
-        return self.__grauInstituicao
-
-    def getEstadoCivil(self):
-        return self.__estadoCivil
-
-    def getUFNacimento(self):
-        return self.__UFNascimento
-
-    def getMunicipioNasc(self):
-        return self.__municipioNasc
-
-    def getSitCandiPosEleito(self):
-        return self.__sitCandidatoPosEleito
-
-    def getSitCandidatura(self):
-        return self.__sitCanditarura
-
-    def getListaBens(self):
-        return self.__listasBens
-
-    # MÉTODO PARA ALTERAR OBJETO
-    def setAnoEleixao(self, anoEleicao):
-        self.__anoEleicao = anoEleicao
-
-    def setSiglaUF(self, siglaUF):
-        self.__siglaUF = siglaUF
-
-    def setCodigoCargo(self, codigoCargo):
-        self.__codigoCargo = codigoCargo
-
-    def setDescricaoCargo(self, descricaoCargo):
-        self.__descricaoCargo = descricaoCargo
-
-    def setNomeCandidato(self, nomeCandidato):
-        self.__nomeCandidato = nomeCandidato
-
-    def setIdCandidato(self, idCandidato):
-        self.__idCandidato = idCandidato
-
-    def setNumeroUrna(self, numeroUrna):
-        self.__numeroUrna = numeroUrna
-
-    def setCPF(self, cpf):
-        self.__cpf = cpf
-
-    def setNomeUrna(self, nomeUrna):
-        self.__nomeUrna = nomeUrna
-
-    def setNumeroPartido(self, numeroPartido):
-        self.__numeroPartido = numeroPartido
-
-    def setNomePartido(self, nomePartido):
-        self.__nomePartido = nomePartido
-
-    def setSiglaPartido(self, siglaPartido):
-        self.__siglaPartido = siglaPartido
-
-    def setCodigoOcupacao(self, codigoOcupacao):
-        self.__codigoOcupacao = codigoOcupacao
-
-    def setDescricaoOcupacao(self, descricaoOcupacao):
-        self.__descricaoOcupacao = descricaoOcupacao
-
-    def setDataNascimento(self, dataNascimento):
-        self.__dataNascimento = dataNascimento
-
-    def setSexoCandidato(self, sexoNascimento):
-        self.__sexoNascimento = sexoNascimento
-
-    def setGrauInstituicao(self, grauInstituicao):
-        self.__grauInstituicao = grauInstituicao
-
-    def setEstadoCivil(self, estadoCivil):
-        self.__estadoCivil = estadoCivil
-
-    def setUFNacimento(self, UFNacimento):
-        self.__UFNascimento = UFNacimento
-
-    def setMunicipioNasc(self, municipioNasc):
-        self.__municipioNasc = municipioNasc
-
-    def setSitCandiPosEleito(self, sitCandidaturaPosEleito):
-        self.__sitCandidatoPosEleito = sitCandidaturaPosEleito
-
-    def setSitCandidatura(self, sitCandidatura):
-        self.__sitCanditarura = sitCandidatura
-
-    def setListaBens(self, listasBens):
-        self.__listasBens = listasBens
-
-    def incluirBem(self, bens):
-        self.__listaBens = bens
+    def __get_nome_urna(self):
+        return self.__nome_urna
 
 
-    def comparacaoCandidatos(self):
-        tamanhoLista = len(listaGeral)
-        for candidatos in range(tamanhoLista):
-            primeiroCandidato = listaGeral[candidatos]
-            nomeCompletoPrimeiro = primeiroCandidato._Candidato__nomeCompleto
-            cpfPrimeiro = primeiroCandidato._Candidato__cpf
-            for candidatos2 in range(candidatos + 1, tamanhoLista):
-                segundoCandidato = listaGeral[candidatos2]
-                nomeCompletoSegundo = segundoCandidato._Candidato__nomeCompleto
-                cpfSegundo = segundoCandidato._Candidato__cpf
-                if nomeCompletoPrimeiro == nomeCompletoSegundo and cpfPrimeiro == cpfSegundo :
-                    print("encontrei")
+    def __get_num_partido(self):
+        return self.__num_partido
 
 
-    def bensDeclaradosCandidato(self):
-        pass
+    def __get_nome_partido(self):
+        return self.__nome_partido
+
+
+    def __get_sigla_partido(self):
+        return self.__sigla_partido
+
+
+    def __get_cod_profissao(self):
+        return self.__cod_profissao
+
+
+    def __get_profissao(self):
+        return self.__profissao
+
+
+    def __get_data_nasc(self):
+        return self.__data_nasc
+
+
+    def __get_sexo(self):
+        return self.__sexo
+
+
+    def __get_instrucao(self):
+        return self.__instrucao
+
+
+    def __get_estado_civil(self):
+        return self.__estado_civil
+
+
+    def __get_uf_nasc(self):
+        return self.__uf_nasc
+
+
+    def __set_eleicao(self, value):
+        self.__eleicao = value
+
+
+    def __set_uf(self, value):
+        self.__uf = value
+
+
+    def __set_cod_cargo(self, value):
+        self.__cod_cargo = value
+
+
+    def __set_desc_cargo(self, value):
+        self.__desc_cargo = value
+
+
+    def __set_nome(self, value):
+        self.__nome = value
+
+
+    def __set_num_seq(self, value):
+        self.__num_seq = value
+
+
+    def __set_num_urna(self, value):
+        self.__num_urna = value
+
+
+    def __set_cpf(self, value):
+        self.__cpf = value
+
+
+    def __set_nome_urna(self, value):
+        self.__nome_urna = value
+
+
+    def __set_num_partido(self, value):
+        self.__num_partido = value
+
+
+    def __set_nome_partido(self, value):
+        self.__nome_partido = value
+
+
+    def __set_sigla_partido(self, value):
+        self.__sigla_partido = value
+
+
+    def __set_cod_profissao(self, value):
+        self.__cod_profissao = value
+
+
+    def __set_profissao(self, value):
+        self.__profissao = value
+
+
+    def __set_data_nasc(self, value):
+        assert isinstance(value,Data), "valor nao e' um objeto data: {}".format(value)
+        self.__data_nasc = value
+
+
+    def __set_sexo(self, value):
+        self.__sexo = value
+
+
+    def __set_instrucao(self, value):
+        self.__instrucao = value
+
+
+    def __set_estado_civil(self, value):
+        self.__estado_civil = value
+
+
+    def __set_uf_nasc(self, value):
+        self.__uf_nasc = value
+
+
+    eleicao = property(__get_eleicao, __set_eleicao)
+    uf = property(__get_uf, __set_uf)
+    cod_cargo = property(__get_cod_cargo, __set_cod_cargo)
+    desc_cargo = property(__get_desc_cargo, __set_desc_cargo)
+    nome = property(__get_nome, __set_nome)
+    num_seq = property(__get_num_seq, __set_num_seq)
+    num_urna = property(__get_num_urna, __set_num_urna)
+    cpf = property(__get_cpf, __set_cpf)
+    nome_urna = property(__get_nome_urna, __set_nome_urna)
+    num_partido = property(__get_num_partido, __set_num_partido)
+    nome_partido = property(__get_nome_partido, __set_nome_partido)
+    sigla_partido = property(__get_sigla_partido, __set_sigla_partido)
+    cod_profissao = property(__get_cod_profissao, __set_cod_profissao)
+    profissao = property(__get_profissao, __set_profissao)
+    data_nasc = property(__get_data_nasc, __set_data_nasc)
+    sexo = property(__get_sexo, __set_sexo)
+    instrucao = property(__get_instrucao, __set_instrucao)
+    estado_civil = property(__get_estado_civil, __set_estado_civil)
+    uf_nasc = property(__get_uf_nasc, __set_uf_nasc)
+    nome_municipio = property(__get_nome_municipio, __set_nome_municipio)
+    sit_pleito = property(__get_sit_pleito, __set_sit_pleito)
+    sit_cand = property(__get_sit_cand, __set_sit_cand)

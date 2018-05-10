@@ -1,429 +1,129 @@
-from operator import *
-
-import Candidato
-import Bem
-import lista
-tamanhoLista = 0
-tamanhoListaBens = 0
-listaAux = lista.ListaDuplamenteEncadeada()
-listaTeste = lista.ListaDuplamenteEncadeada()
-listaCarregamentoCandidatos = lista.ListaDuplamenteEncadeada()
-
-listaBens = lista.ListaDuplamenteEncadeada()
-listaDesBens = lista.ListaDuplamenteEncadeada()
-listaGeral = lista.ListaDuplamenteEncadeada()
-listaDetalhadaBens = lista.ListaDuplamenteEncadeada()
-listaGeralBens = lista.ListaDuplamenteEncadeada()
-
-
-
-acessoArquivoBens = "bem_candidato_2014"
-acessoListasBens = "bem_candidato_2014_"
-acessoArquivoConsulta = "consulta_cand_2014"
-acessoListasConsulta =  "consulta_cand_2014_"
-UFs = ["AC"]
-#, "AM", "AP", "BA", "BR", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO", "ZZ"]
+from Lista import Lista
+from Candidato import Candidato
+from Bem import Bem
+from time import perf_counter
 
 class Controle:
     def __init__(self):
-        pass
-    def carregamentoCandidatos(self, acessoListas):
-        global tamanhoLista
-        carregamentoCandidatos = open(acessoListas,"r")
-        arquivo = carregamentoCandidatos.readlines()
-        for lista in arquivo:
-            parametro = ""
-            for dados in lista:
-                if dados != ";":
-                    parametro += dados
-                else:
-                    listaCarregamentoCandidatos.adicionarAuxiliar(parametro)
-                    parametro = ""
-            candidatos = Candidato.Candidato()
+        self.__candidatos = Lista()
+    
+    def carregarCandidatos(self,arquivo):        
+        with open(arquivo,encoding='latin1') as f:
+            for linha in f:
+                l = linha.strip().split(';')
+#                 2 ANO_ELEICAO
+#                 5 SIGLA_UF
+#                 8 CODIGO_CARGO
+#                 9 DESCRICAO_CARGO
+#                 10 NOME_CANDIDATO
+#                 11 SEQUENCIAL_CANDIDATO
+#                 12 NUMERO_CANDIDATO
+#                 13 CPF_CANDIDATO
+#                 14 NOME_URNA_CANDIDATO
+#                 16 DES_SITUACAO_CANDIDATURA
+#                 17 NUMERO_PARTIDO
+#                 18 SIGLA_PARTIDO
+#                 19 NOME_PARTIDO
+#                 24 CODIGO_OCUPACAO
+#                 25 DESCRICAO_OCUPACAO
+#                 26 DATA_NASCIMENTO
+#                 30 DESCRICAO_SEXO
+#                 32 DESCRICAO_GRAU_INSTRUCAO
+#                 34 DESCRICAO_ESTADO_CIVIL
+#                 39 SIGLA_UF_NASCIMENTO
+#                 41 NOME_MUNICIPIO_NASCIMENTO
+#                 44 DESC_SIT_TOT_TURNO
+                cand = Candidato(eleicao=l[2].strip('"'),
+                                uf=l[5].strip('"'),
+                                cod_cargo=l[8].strip('"'),
+                                desc_cargo=l[9].strip('"'),
+                                nome=l[10].strip('"'),
+                                num_seq=l[11].strip('"'),
+                                num_urna=l[12].strip('"'),
+                                cpf=l[13].strip('"'),
+                                nome_urna=l[14].strip('"'),
+                                num_partido=l[17].strip('"'),
+                                nome_partido=l[19].strip('"'),
+                                sigla_partido=l[18].strip('"'),
+                                cod_profissao=l[24].strip('"'),
+                                profissao=l[25].strip('"'),
+                                data_nasc=l[26].strip('"'),
+                                sexo=l[30].strip('"'),
+                                instrucao=l[32].strip('"'),
+                                estado_civil=l[34].strip('"'),
+                                uf_nasc=l[39].strip('"'),
+                                nome_municipio=l[41].strip('"'),
+                                sit_pleito=l[44].strip('"'),
+                                sit_cand=l[16].strip('"'))
+                self.__candidatos.inserirOrdenado(cand)
+                self.__candidatos.inserir(cand)
+                self.__indiceCand[cand.num_seq] = cand
+    
+    def carregarBens(self,arquivo):
+        with open(arquivo,encoding='latin1') as f:
+            for linha in f:
+                l = linha.strip().split(';')
+# 5 SQ_CANDIDATO
+# 6 CD_TIPO_BEM_CANDIDATO
+# 7 DS_TIPO_BEM_CANDIDATO
+# 8 DETALHE_BEM
+# 9 VALOR_BEM
+                bem = Bem(cod_tipo=int(l[6].strip('"')), 
+                          desc_tipo=l[7].strip('"'), 
+                          descricao=l[8].strip('"'), 
+                          valor=float(l[9].strip('"')))                
+                try:
+                    cand = self.__candidatos.pesquisa(l[5].strip('"'),key='num_seq')
+                    cand.inserirBem(bem)
+                except ValueError:
+                    pass
+                except KeyError:
+                    pass    
+                
+    def candidatos(self):
+        return self.__candidatos
 
-            candidatos.setAnoEleixao(listaCarregamentoCandidatos.acessar(2))
-            candidatos.setSiglaUF(listaCarregamentoCandidatos.acessar(5))
-            candidatos.setCodigoCargo(listaCarregamentoCandidatos.acessar(8))
-            candidatos.setDescricaoCargo(listaCarregamentoCandidatos.acessar(9))
-            candidatos.setNomeCandidato(listaCarregamentoCandidatos.acessar(10))
-            candidatos.setIdCandidato(listaCarregamentoCandidatos.acessar(11))
-            candidatos.setNumeroUrna(listaCarregamentoCandidatos.acessar(12))
-            candidatos.setCPF(listaCarregamentoCandidatos.acessar(13))
-            candidatos.setNomeUrna(listaCarregamentoCandidatos.acessar(14))
-            candidatos.setNumeroPartido(listaCarregamentoCandidatos.acessar(17))
-            candidatos.setNomePartido(listaCarregamentoCandidatos.acessar(19))
-            candidatos.setSiglaPartido(listaCarregamentoCandidatos.acessar(18))
-            candidatos.setCodigoOcupacao(listaCarregamentoCandidatos.acessar(24))
-            candidatos.setDescricaoOcupacao(listaCarregamentoCandidatos.acessar(25))
-            candidatos.setDataNascimento(listaCarregamentoCandidatos.acessar(26))
-            candidatos.setSexoCandidato(listaCarregamentoCandidatos.acessar(30))
-            candidatos.setGrauInstituicao(listaCarregamentoCandidatos.acessar(31))
-            candidatos.setEstadoCivil(listaCarregamentoCandidatos.acessar(34))
-            candidatos.setUFNacimento(listaCarregamentoCandidatos.acessar(39))
-            candidatos.setMunicipioNasc(listaCarregamentoCandidatos.acessar(41))
-            candidatos.setSitCandiPosEleito(listaCarregamentoCandidatos.acessar(44))
-            candidatos.setSitCandidatura(listaCarregamentoCandidatos.acessar(16))
-            candidatos.setListaBens(listaBens)
+class Cronometro:
+    ''' Cronometra tempo gasto desde a criacao ate a chamada do metodo
+        tempo_gasto
+    '''    
+    def __init__(self):
+        self.__criacao = perf_counter()
+    
+    def inicia(self):
+        self.__inicio = perf_counter()
+    def para(self):
+        self.__fim = perf_counter()        
+    def tempo_gasto(self):
+        return self.__fim - self.__inicio
 
-            listaGeral.adicionar(candidatos)
-            listaCarregamentoCandidatos.adicionarAuxiliar(True)
-            tamanhoLista += 1
-        tamanhoLista -= 1
-        carregamentoCandidatos.close()
-
-    def carregamentoBensCandidatos(self, caminhoArquivo):
-        carregamentoBens = open(caminhoArquivo,"r")
-        arquivoBens = carregamentoBens.readlines()
-        print(tamanhoLista)
-        for listaBens in arquivoBens:
-           parametro = ""
-           for elementos in listaBens:
-                if elementos != ";":
-                    parametro += elementos
-                else:
-                    listaDetalhadaBens.adicionarAuxiliar(parametro)
-                    parametro = ""
-
-           idCandidato = listaDetalhadaBens.acessar(5)
-
-           bens = Bem.Bem(listaDetalhadaBens.acessar(6), listaDetalhadaBens.acessar(7), listaDetalhadaBens.acessar(8).replace('"', ""),float(listaDetalhadaBens.acessar(9).replace('"', "")))
-           listaGeralBens.adicionar(bens)
-           index = 0
-           entrei = False
-           while index < tamanhoLista:
-               verificador = listaGeral.pesquisa(index)._Candidato__idCandidato
-
-               if idCandidato == verificador:
-                   adicionandoBens = listaGeral.pesquisa(index)
-                   if listaGeral.pesquisa(index)._Candidato__listaBens == [None,None]:
-                       valor = bens._Bem__valorBem
-                       descricao = bens._Bem__descDetalhadoBem
-
-                       bem = [valor, descricao]
-                       listaGeral.pesquisa(index).incluirBem(bem)
-                       index += 50000
-                       entrei = True
-                   else:
-                       valor = bens._Bem__valorBem
-                       descricao = bens._Bem__descDetalhadoBem
-                       adicionando = listaGeral.pesquisa(index)._Candidato__listaBens
-                       adicionando[0] += valor
-                       adicionando[1] += descricao
-                       bem = [adicionando[0], adicionando[1]]
-                       listaGeral.pesquisa(index).incluirBem(bem)
-                       entrei = True
-
-               index += 1
-           if entrei == False:
-               bem = [None,None]
-               listaGeral.pesquisa(index - 1).incluirBem(bem)
-
-           listaDetalhadaBens.adicionarAuxiliar(True)
-        carregamentoBens.close()
-
-    def recuperandoUsuarios(self,entrada):
-        index = 0
-        if entrada == "1":
-            verificacao = input("Forneça o nome do partido a ser analisado: ")
-            verificacao = verificacao.upper()
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__nomePartido
-                verificador = verificador.replace('"',"")
-                if verificacao == verificador:
-                    print(listaGeral.pesquisa(index))
-                verificador = ""
-                index += 1
-
-        elif entrada == "2":
-            verificacao = input("Forneça o nome do estado a ser analisado: ")
-            verificacao = verificacao.upper()
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__siglaUF
-                verificador = verificador.replace('"',"")
-                if verificacao == verificador:
-                    print(listaGeral.pesquisa(index))
-                verificador = ""
-                index += 1
-        elif entrada == "3":
-            verificacao = input("Forneça o nome da cidade a ser analisada: ")
-            verificacao = verificacao.upper()
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__municipioNasc
-                verificador = verificador.replace('"',"")
-                if verificacao == verificador:
-                     print(listaGeral.pesquisa(index))
-                verificador = ""
-                index += 1
-        elif entrada == "4":
-            verificacao = input("Forneça o nome do cargo a ser analisado: ")
-            verificacao = verificacao.upper()
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__descricaoCargo
-                verificador = verificador.replace('"',"")
-                if verificacao == verificador:
-                    print(listaGeral.pesquisa(index))
-                verificador = ""
-                index += 1
-        elif entrada == "5":
-            verificacao = float(input("Forneça um valor base -> "))
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__listaBens
-                verificador = verificador[0]
-                if verificador != None:
-                    if verificacao < verificador:
-                        print(listaGeral.pesquisa(index))
-                index += 1
-        elif entrada == "6":
-            verificacao = "ELEITO"
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__sitCandiPosEleito
-                verificador = verificador.replace('"',"")
-
-                if verificacao == verificador:
-                    print(listaGeral.pesquisa(index))
-                verificador = ""
-                index += 1
-        elif entrada == "7":
-            verificacao = "NÃO ELEITO"
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__sitCandidatura
-                verificador = verificador.replace('"',"")
-                if verificacao == verificador:
-                    print(verificacao)
-                verificador = ""
-                index += 1
-        else:
-            print("entrada inválida")
-
-    def mediaTotalBens(self, entrada):
-        valorTotal = 0
-        media = 0
-        contador = 0
-        index = 0
-        if entrada == "1":
-            verificacao = input("Forneça o nome do cargo a ser analisado: ")
-            verificacao = verificacao.upper()
-            while index < tamanhoLista:
-                acessoTipo = listaGeral.pesquisa(index)._Candidato__descricaoCargo
-                acessoTipo = acessoTipo.replace('"', "")
-                if verificacao == acessoTipo:
-                    objetoValor = listaGeral.pesquisa(index)._Candidato__listaBens
-                    valor = objetoValor[0]
-                    if valor != None:
-                        valorTotal += valor
-                    contador += 1
-                index += 1
-            if contador != 0:
-                media = valorTotal / contador
-                print("valor total:" +str(valorTotal))
-                print("media: " +str(media))
-                return media
-        elif entrada == "2":
-
-            verificacao = input("Forneça a sigla do Estado a ser analisado: ")
-            verificacao = verificacao.upper()
-            while index < tamanhoLista:
-                acessoTipo = listaGeral.pesquisa(index)._Candidato__siglaUF
-                acessoTipo = acessoTipo.replace('"', "")
-                if verificacao == acessoTipo:
-                    objetoValor = listaGeral.pesquisa(index)._Candidato__listaBens
-                    valor = objetoValor[0]
-                    if valor != None:
-                        valorTotal += valor
-                    contador += 1
-                index += 1
-            if contador != 0:
-                media = valorTotal / contador
-                print("valor total:" +str(valorTotal))
-                print("media: " +str(media))
-                return media
-        elif entrada == "3":
-            verificacao = input("Forneça a ocupação dos candidatos a serem analisados: ")
-            verificacao = verificacao.upper()
-            while index < tamanhoLista:
-                acessoTipo = listaGeral.pesquisa(index)._Candidato__descricaoOcupacao
-                acessoTipo = acessoTipo.replace('"', "")
-                if verificacao == acessoTipo:
-                    objetoValor = listaGeral.pesquisa(index)._Candidato__listaBens
-                    valor = objetoValor[0]
-                    if valor != None:
-                        valorTotal += valor
-                        contador += 1
-                index += 1
-            if contador != 0:
-                media = valorTotal / contador
-                print("valor total:" + str(valorTotal))
-                print("media: " + str(media))
-                return media
-        elif entrada == "4":
-            index = 0
-
-            verificacao = input("Forneça a data de nascimento a ser analisada: dia/mês/ano")
-            verificacao = verificacao.upper()
-            while index < tamanhoLista:
-                acessoTipo = listaGeral.pesquisa(index)._Candidato__dataNascimento
-                acessoTipo = acessoTipo.replace('"', "")
-                if verificacao == acessoTipo:
-                    print("entrei")
-                    objetoValor = listaGeral.pesquisa(index)._Candidato__listaBens
-                    valor = objetoValor[0]
-                    if valor != None:
-                        valorTotal += valor
-                        contador += 1
-                index += 1
-            if contador != 0:
-                media = valorTotal / contador
-                print("valor total:" + str(valorTotal))
-                print("media: " + str(media))
-                return media
-    def excluirCandidato(self, removeCandidato):
-        index = 0
-        removeCandidato = removeCandidato.upper()
-        while index < tamanhoLista:
-            sitCandidatura = listaGeral.pesquisa(index)._Candidato__sitCandidatura
-
-            sitCandidaturaPos = listaGeral.pesquisa(index)._Candidato__sitCandiPosEleito
-            sinCandidaturaPos  = sitCandidaturaPos.replace('"',"")
-            sitCandidatura = sitCandidatura.replace('"', "")
-            if removeCandidato == sitCandidatura or removeCandidato == sitCandidaturaPos:
-                x = listaGeral.pesquisa(index)
-                listaGeral.remove(x)
-            index += 1
-    def ordenandoCandidatos(self, entrada):
-        if entrada == "1":
-            index = 1
-            while index < tamanhoLista:
-
-                x = listaGeral.pesquisa(index)
-                comparacaoNomes01 = listaGeral.pesquisa(index)._Candidato__nomeCandidato
-                comparacaoNomes01 = comparacaoNomes01.replace('"',"")
-                j = index - 1
-                comparacaoNomes02 = listaGeral.pesquisa(j)._Candidato__nomeCandidato
-                comparacaoNomes02 = comparacaoNomes02.replace('"', "")
-                while j >= 0 and comparacaoNomes01 < comparacaoNomes02:
-                    print(comparacaoNomes01, "<", comparacaoNomes02)
-                    x = listaGeral.adicionarPosicao(j+1,listaGeral.pesquisa(j))
-                    print(j)
-                    j = j - 1
-                listaGeral.adicionarPosicao(j+1,x)
-                index += 1
-        elif entrada == "2":
-            verificacao = input("Forneça o nome do estado a ser analisado: ")
-            verificacao = verificacao.upper()
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__siglaUF
-                verificador = verificador.replace('"',"")
-                if verificacao == verificador:
-                    print(listaGeral.pesquisa(index))
-                verificador = ""
-                index += 1
-
-        elif entrada == "3":
-            verificacao = input("Forneça o nome da cidade a ser analisada: ")
-            verificacao = verificacao.upper()
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__municipioNasc
-                verificador = verificador.replace('"',"")
-                if verificacao == verificador:
-                     print(listaGeral.pesquisa(index))
-                verificador = ""
-                index += 1
-        elif entrada == "4":
-            verificacao = input("Forneça o nome do cargo a ser analisado: ")
-            verificacao = verificacao.upper()
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__descricaoCargo
-                verificador = verificador.replace('"',"")
-                if verificacao == verificador:
-                    print(listaGeral.pesquisa(index))
-                verificador = ""
-                index += 1
-        elif entrada == "5":
-            verificacao = float(input("Forneça um valor base -> "))
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__listaBens
-                verificador = verificador[0]
-                if verificador != None:
-                    if verificacao < verificador:
-                        print(listaGeral.pesquisa(index))
-                index += 1
-        elif entrada == "6":
-            verificacao = "ELEITO"
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__sitCandiPosEleito
-                verificador = verificador.replace('"',"")
-
-                if verificacao == verificador:
-                    print(listaGeral.pesquisa(index))
-                verificador = ""
-                index += 1
-        elif entrada == "7":
-            verificacao = "NÃO ELEITO"
-            while index < tamanhoLista:
-                verificador = listaGeral.pesquisa(index)._Candidato__sitCandidatura
-                verificador = verificador.replace('"',"")
-                if verificacao == verificador:
-                    print(verificacao)
-                verificador = ""
-                index += 1
-        else:
-            print("entrada inválida")
-        print(listaGeral.mostrar())
-for uf in UFs:
-    candidatosConsulta = str(acessoArquivoConsulta + "/" + acessoListasConsulta + uf +".txt")
-    candidatosBens = str(acessoArquivoBens + "/" + acessoListasBens + uf +".txt")
-
-    candidatos = Controle()
-
-    candidatos.carregamentoCandidatos(candidatosConsulta)
-    candidatos.carregamentoBensCandidatos(candidatosBens)
-
-print("################ Banco de dados Justiça Eleitorial 2014 ################")
-print("########################################################################\n")
-print("# 1 - Análise específica no banco de dados")
-print("# 2 - Análise ordenada dos elementos do banco de dados")
-print("# 3 - Análise específica das médias totais")
-print("# 4 - Remover candidatos específicos")
-print("# 5 - Análise dos candidatos de forma ordenada")
-opcao = input("\nForneça a numeração de acordo com a atividade desejada -> ")
-
-if opcao == "1":
-    print("\n#   1 - Análide por partido")
-    print("#   2 - Análise por Estado")
-    print("#   3 - Análise por cidade de nascimento")
-    print("#   4 - Análise de candidatos a um determinado cargo")
-    print("#   5 - Análise do Valor total de bens declarado")
-    print("#   6 - Análise dos que foram eleitos")
-    print("#   7 - Análise dos que não foram eleitos")
-    entrada = input("\nForneça a numeração de acordo com a atividade desejada -> ")
-    x = candidatos.recuperandoUsuarios(entrada)
-    print(x)
-
-elif opcao == "2":
-    print("\nAinda não ta pronto")
-elif opcao == "3":
-    print("\n#   1 - Análise da média total de bens por cargo")
-    print("#   2 - Análise da média total de bens por Estado")
-    print("#   3 - Análise da média total de bens por ocupação")
-    print("#   4 - Análise da média total de bens por ano de nascimento")
-    entrada = input("\nForneça a numeração de acordo com a atividade desejada -> ")
-    x = candidatos.mediaTotalBens(entrada)
-elif opcao == "4":
-    print("\n#   Removendo candidatos ")
-    entrada = input("\nForneça um critério para remoção dos candidatos da lista -> ")
-    x = candidatos.excluirCandidato(entrada)
-
-elif opcao == "4":
-    print("- Eleito \n - Não eleito \n - Indeferido - \n + \n- deferido\n- deferido com  recurso  \n- indeferido"
-          + "\n- indeferido com recurso  \n- renúnica  \n- cancelado\n  ")
-    entrada = input("Forneça um critério para exclução de candidatos do banco de dados ex: eleitos, não eleitos, indeferidos e etc-> ")
-    x = candidatos.excluirCandidato(entrada)
-elif opcao == "5":
-    print("\n#   1 - Alfabética pelo nome em ordem crescente")
-    print("#   2 - Alfabética pelo nome em ordem decrescente")
-    print("#   3 - Pelo total dos bens (crescente)")
-    print("#   4 - Pelo total dos bens (decrescente)")
-    print("#   5 - Pela data de nascimento (crescente)")
-    print("#   6 - Pela data de nascimento (decrescente)")
-    entrada = input("\nForneça a numeração de acordo com a atividade desejada -> ")
-    candidatos.ordenandoCandidatos(entrada)
+                
+if __name__ == '__main__':
+    UFs = ["AC","AL","AM","AP","BA","CE","DF","ES","GO","MA",
+          "MG","MS","MT","PA","PB","PE","PI","PR","RJ","RN",
+          "RO","RR","RS","SC","SE","SP","TO"]    
+    arq_cand = "consulta_cand_2014_{}.txt"
+    arq_bem = "bem_candidato_2014_{}.txt"
+    ctrl = Controle()
+    
+    cron = Cronometro()
+    cron.inicia()
+    for uf in UFs:
+        ctrl.carregarCandidatos(arq_cand.format(uf))
+    cron.para()
+    tempoCand = cron.tempo_gasto()    
+    
+    cron.inicia()
+    for uf in UFs:
+        ctrl.carregarBens(arq_bem.format(uf))        
+    cron.para()
+    tempoBem = cron.tempo_gasto()
+    
+    print("Tempo gasto no carregamento dos dados dos candidatos: {:.3f}s".format(tempoCand))
+    print("Tempo gasto no carregamento dos dados dos bens dos candidatos: {:.3f}s\n".format(tempoBem))
+    
+    i=0
+    for c in ctrl.candidatos():
+        print(c)
+        if i > 4: break
+        i += 1
