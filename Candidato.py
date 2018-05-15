@@ -3,7 +3,7 @@ from Lista import Lista
 from Bem import Bem
 from collections import defaultdict
 import locale
-#locale.setlocale(locale.LC_ALL, 'pt_br.utf-8')
+locale.setlocale(locale.LC_ALL, 'pt')
 
 
 class Candidato:

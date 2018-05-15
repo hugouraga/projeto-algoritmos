@@ -6,8 +6,8 @@ from time import perf_counter
 
 class Controle:
     def __init__(self):
-        #self.__candidatos = Lista()
-        self.__candidatos = Arvore() # Hugo - alterado
+        self.__candidatos = Lista()
+        self.__Indice = Arvore() # Hugo - alterado
     
     def carregarCandidatos(self,arquivo):        
         with open("consulta_cand_2014/"+arquivo,encoding='latin1') as f:
@@ -60,7 +60,7 @@ class Controle:
                 #self.__candidatos.inserirOrdenado(cand)
                 #self.__candidatos.inserir(cand)
                 #self.__candidatos.adicionar(cand.num_seq, cand) # hugo - alterado
-                self.__candidatos[cand.num_seq] = cand # hugo alterado
+                self.__Indice[cand.num_seq] = cand # hugo alterado
                 
     
     def carregarBens(self,arquivo):
@@ -78,13 +78,14 @@ class Controle:
                           valor=float(l[9].strip('"')))                
                 try:
                     #cand = self.__candidatos.pesquisa(l[5].strip('"'),key='num_seq')
-                    cand = self.__candidatos[l[5].strip('"')] # Hugo - alterado
+                    cand = self.__Indice[l[5].strip('"')] # Hugo - alterado
                     cand.inserirBem(bem)
 
                 except ValueError:
                     pass
                 except KeyError:
-                    pass    
+                    pass
+
                 
     def candidatos(self):
         return self._Controle__candidatos
@@ -127,10 +128,11 @@ if __name__ == '__main__':
     
     print("Tempo gasto no carregamento dos dados dos candidatos: {:.3f}s".format(tempoCand))
     print("Tempo gasto no carregamento dos dados dos bens dos candidatos: {:.3f}s\n".format(tempoBem))
-    
-    i=0
-    #for c in ctrl.candidatos(): # Hugo - alterado
-    #    print(c) # Hugo - alterado
-    #    if i > 4: break # Hugo - alterado
-    #    i += 1 # Hugo - alterado
+    i = 0
+    print(ctrl.candidatos())
+    for c in ctrl.candidatos():
+        print('1')
+        print(c)
+        if i > 4: break
+        i += 1
     
