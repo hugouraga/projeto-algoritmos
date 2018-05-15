@@ -58,7 +58,7 @@ class Controle:
                                 sit_pleito=l[44].strip('"'),
                                 sit_cand=l[16].strip('"'))
                 #self.__candidatos.inserirOrdenado(cand)
-                #self.__candidatos.inserir(cand)
+                self.__candidatos.inserir(cand)
                 #self.__candidatos.adicionar(cand.num_seq, cand) # hugo - alterado
                 self.__Indice[cand.num_seq] = cand # hugo alterado
                 
@@ -88,7 +88,7 @@ class Controle:
 
                 
     def candidatos(self):
-        return self._Controle__candidatos
+        return self.__candidatos
 
 class Cronometro:
     ''' Cronometra tempo gasto desde a criacao ate a chamada do metodo
@@ -129,7 +129,6 @@ if __name__ == '__main__':
     print("Tempo gasto no carregamento dos dados dos candidatos: {:.3f}s".format(tempoCand))
     print("Tempo gasto no carregamento dos dados dos bens dos candidatos: {:.3f}s\n".format(tempoBem))
     i = 0
-    print(ctrl.candidatos())
     for c in ctrl.candidatos():
         print('1')
         print(c)
