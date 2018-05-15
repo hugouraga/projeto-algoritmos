@@ -3,7 +3,7 @@ from Lista import Lista
 from Bem import Bem
 from collections import defaultdict
 import locale
-locale.setlocale(locale.LC_ALL, 'pt_br.utf-8')
+#locale.setlocale(locale.LC_ALL, 'pt_br.utf-8')
 
 
 class Candidato:
@@ -55,7 +55,7 @@ class Candidato:
         self.__nome_municipio=nome_municipio
         self.__sit_pleito=sit_pleito
         self.__sit_cand=sit_cand
-        self.__bens=Lista()
+        self.__bens= Lista()
 
     def __str__(self):        
         saida = '{} -- {} -- {}\n'.format(self.nome_urna,self.num_urna,self.sigla_partido)

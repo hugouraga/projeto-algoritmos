@@ -1,14 +1,16 @@
 from Lista import Lista
+from Arvore import Arvore # hugo - alterado
 from Candidato import Candidato
 from Bem import Bem
 from time import perf_counter
 
 class Controle:
     def __init__(self):
-        self.__candidatos = Lista()
+        #self.__candidatos = Lista()
+        self.__candidatos = Arvore() # Hugo - alterado
     
     def carregarCandidatos(self,arquivo):        
-        with open(arquivo,encoding='latin1') as f:
+        with open("consulta_cand_2014/"+arquivo,encoding='latin1') as f:
             for linha in f:
                 l = linha.strip().split(';')
 #                 2 ANO_ELEICAO
@@ -55,33 +57,37 @@ class Controle:
                                 nome_municipio=l[41].strip('"'),
                                 sit_pleito=l[44].strip('"'),
                                 sit_cand=l[16].strip('"'))
-                self.__candidatos.inserirOrdenado(cand)
-                self.__candidatos.inserir(cand)
-                self.__indiceCand[cand.num_seq] = cand
+                #self.__candidatos.inserirOrdenado(cand)
+                #self.__candidatos.inserir(cand)
+                #self.__candidatos.adicionar(cand.num_seq, cand) # hugo - alterado
+                self.__candidatos[cand.num_seq] = cand # hugo alterado
+                
     
     def carregarBens(self,arquivo):
-        with open(arquivo,encoding='latin1') as f:
+        with open("bem_candidato_2014/"+arquivo,encoding='latin1') as f:
             for linha in f:
                 l = linha.strip().split(';')
 # 5 SQ_CANDIDATO
 # 6 CD_TIPO_BEM_CANDIDATO
 # 7 DS_TIPO_BEM_CANDIDATO
 # 8 DETALHE_BEM
-# 9 VALOR_BEM
+# 9 VALOR_BEM   
                 bem = Bem(cod_tipo=int(l[6].strip('"')), 
                           desc_tipo=l[7].strip('"'), 
                           descricao=l[8].strip('"'), 
                           valor=float(l[9].strip('"')))                
                 try:
-                    cand = self.__candidatos.pesquisa(l[5].strip('"'),key='num_seq')
+                    #cand = self.__candidatos.pesquisa(l[5].strip('"'),key='num_seq')
+                    cand = self.__candidatos[l[5].strip('"')] # Hugo - alterado
                     cand.inserirBem(bem)
+
                 except ValueError:
                     pass
                 except KeyError:
                     pass    
                 
     def candidatos(self):
-        return self.__candidatos
+        return self._Controle__candidatos
 
 class Cronometro:
     ''' Cronometra tempo gasto desde a criacao ate a chamada do metodo
@@ -123,7 +129,8 @@ if __name__ == '__main__':
     print("Tempo gasto no carregamento dos dados dos bens dos candidatos: {:.3f}s\n".format(tempoBem))
     
     i=0
-    for c in ctrl.candidatos():
-        print(c)
-        if i > 4: break
-        i += 1
+    #for c in ctrl.candidatos(): # Hugo - alterado
+    #    print(c) # Hugo - alterado
+    #    if i > 4: break # Hugo - alterado
+    #    i += 1 # Hugo - alterado
+    
