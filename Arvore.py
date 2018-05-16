@@ -1,4 +1,3 @@
-from operator import attrgetter
 class No:
     def __init__(self,chave=None,valor=None):
         self.chave = chave
@@ -39,15 +38,3 @@ class Arvore:
 
     def __setitem__(self, chave, valor):
         self.adicionar(chave,valor)
-        """#[nodo._No__chave,nodo._No__valor][chave]=[valor]
-        nodo = self.__raiz
-        for elementos in chave:
-            if nodo._No__proximo[int(elementos)] == None:
-                nodo._No__proximo[int(elementos)] = No()
-            nodo = nodo._No__proximo[int(elementos)]
-        if not nodo._No__chave is None:
-            nodo._No__chave = chave
-            return
-        nodo._No__chave = chave
-n        nodo._No__valor = valor"""
-         

@@ -1,0 +1,46 @@
+Tempo gasto no carregamento dos dados dos candidatos: 1.174s
+Tempo gasto no carregamento dos dados dos bens dos candidatos: 1.791s
+
+CARLOS NOGUEIRA -- 22143 -- PR
+DEPUTADO ESTADUAL (AC)
+Resumo dos bens:
+Total declarado: R$348.999,52
+Outros fundos: R$31.199,52
+Outros bens imóveis: R$202.000,00
+Terra nua: R$21.800,00
+Veículo automotor terrestre: caminhão, automóvel, moto, etc.: R$94.000,00
+
+CONCITA DA SAÚDE -- 43300 -- PV
+DEPUTADO ESTADUAL (AC)
+Resumo dos bens:
+Total declarado: R$0,00
+
+
+JÉSSICA SALES -- 1515 -- PMDB
+DEPUTADO FEDERAL (AC)
+Resumo dos bens:
+Total declarado: R$150.000,00
+Veículo automotor terrestre: caminhão, automóvel, moto, etc.: R$150.000,00
+
+CALEGARIO -- 11000 -- PP
+DEPUTADO ESTADUAL (AC)
+Resumo dos bens:
+Total declarado: R$725.000,00
+Veículo automotor terrestre: caminhão, automóvel, moto, etc.: R$75.000,00
+Casa: R$650.000,00
+
+ELIZEU -- 12555 -- PDT
+DEPUTADO ESTADUAL (AC)
+Resumo dos bens:
+Total declarado: R$750.000,00
+Veículo automotor terrestre: caminhão, automóvel, moto, etc.: R$360.000,00
+Terreno: R$150.000,00
+Quotas ou quinhões de capital: R$240.000,00
+
+JESUS SERGIO -- 12222 -- PDT
+DEPUTADO ESTADUAL (AC)
+Resumo dos bens:
+Total declarado: R$205.000,00
+Casa: R$140.000,00
+Veículo automotor terrestre: caminhão, automóvel, moto, etc.: R$45.000,00
+Terreno: R$20.000,00

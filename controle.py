@@ -130,7 +130,6 @@ if __name__ == '__main__':
     print("Tempo gasto no carregamento dos dados dos bens dos candidatos: {:.3f}s\n".format(tempoBem))
     i = 0
     for c in ctrl.candidatos():
-        print('1')
         print(c)
         if i > 4: break
         i += 1
